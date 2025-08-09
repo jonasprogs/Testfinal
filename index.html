@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ausgaben · MVP</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <style>
+    :root{
+      --bg:#0f172a; /* slate-900 */
+      --panel:#111827; /* gray-900 */
+      --muted:#9ca3af; /* gray-400 */
+      --text:#e5e7eb; /* gray-200 */
+      --primary:#22c55e; /* green-500 */
+      --danger:#ef4444; /* red-500 */
+      --warn:#f59e0b; /* amber-500 */
+      --accent:#38bdf8; /* sky-400 */
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      background:linear-gradient(180deg,#0b1220, var(--bg));
+      color:var(--text);
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    header{
+      position:sticky; top:0; z-index:30;
+      background:rgba(15,23,42,.8);
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid #1f2937;
+      padding:12px 12px;
+      display:flex; gap:8px; align-items:center; justify-content:space-between;
+    }
+    header h1{font-size:18px; margin:0; letter-spacing:.3px}
+    header small{color:var(--muted)}
+    .pill{padding:6px 10px; border:1px solid #1f2937; border-radius:999px; background:#0b1220; color:var(--text);}
+    .container{max-width:940px; margin:0 auto; padding:16px}
+    .card{background:rgba(17,24,39,.8); border:1px solid #1f2937; border-radius:16px; padding:14px; margin-bottom:14px;}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .row > *{flex:1}
+    input, select, button, textarea{
+      width:100%; padding:12px 12px; border-radius:12px; border:1px solid #1f2937; background:#0b1220; color:var(--text);
+      outline:none;
+    }
+    input::placeholder, textarea::placeholder{color:#6b7280}
+    button{cursor:pointer}
+    .btn{background:#1f2937; border-color:#243045}
+    .btn-primary{background:var(--primary); border-color:#16a34a; color:#06210f; font-weight:600}
+    .btn-danger{background:var(--danger); border-color:#b91c1c; color:#190404}
+    .btn-accent{background:var(--accent); border-color:#0ea5e9; color:#04141a}
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+    .list{display:grid; gap:8px; margin-top:8px}
+    .item{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      background:#0b1220; border:1px solid #1f2937; border-radius:12px; padding:10px 12px;
+    }
+    .item .meta{display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:12px}
+    .badge{padding:2px 8px; border-radius:999px; background:#102132; color:#a5f3fc; border:1px solid #1f2937; font-size:12px}
+    .right{display:flex; align-items:center; gap:8px}
+    .muted{color:var(--muted)}
+    .ok{color:var(--primary)}
+    .warn{color:var(--warn)}
+    .danger{color:var(--danger)}
+    .tabs{display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap}
+    .tabs button{flex:0 0 auto}
+    .section-title{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px}
+    .divider{height:1px; background:#1f2937; margin:10px 0}
+    details summary{cursor:pointer; list-style:none}
+    details summary::-webkit-details-marker{display:none}
+    .lock-overlay{
+      position:fixed; inset:0; background:linear-gradient(180deg,#070b14,#0b1220);
+      display:flex; align-items:center; justify-content:center; z-index:50;
+      border-top:1px solid #1f2937;
+    }
+    .lock-card{width:min(420px,90vw);}
+    .center{display:flex; align-items:center; justify-content:center}
+    .tiny{font-size:12px}
+    .kbd{padding:2px 6px; border:1px solid #334155; border-bottom-width:2px; border-radius:6px; background:#0b1220; color:#9ca3af; font-size:12px}
+    .footer{padding:16px; text-align:center; color:#9ca3af; font-size:12px}
+  </style>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header>
+    <div style="display:flex; align-items:center; gap:10px">
+      <h1>Ausgaben</h1>
+      <small class="muted">MVP · Offline</small>
+    </div>
+    <button id="installBtn" class="pill">Installieren</button>
+  </header>
+
+  <div class="divider"></div>
+      <details>
+        <summary class="muted">Passcode festlegen/ändern</summary>
+        <div class="grid-2" style="margin-top:8px">
+          <input id="newPin" type="password" inputmode="numeric" placeholder="Neuer Passcode">
+          <button id="setPinBtn" class="btn-accent">Speichern</button>
+        </div>
+
+      </details>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Schnell-Erfassung -->
+    <div class="card">
+      <div class="section-title">
+        <h3 style="margin:0">Schnellerfassung</h3>
+        <span class="tiny muted">Beispiele: <span class="kbd">10,50 lebensmittel</span> · <span class="kbd">12,99 Döner gestern lebensmittel</span> · <span class="kbd">25 Lidl 12.08 lebensmittel</span></span>
+      </div>
+      <div class="row">
+        <input id="quick" placeholder="z. B. 10,50 Lidl gestern lebensmittel">
+        <button id="parseBtn" class="btn-primary">Hinzufügen</button>
+      </div>
+      <p class="tiny muted">Tipp: iOS‑Diktierfunktion verwenden (Mikrofon auf der Tastatur).</p>
+    </div>
+
+    <!-- Heute verbleibend -->
+    <div class="card" id="dailyCard">
+      <div class="section-title">
+        <h3 style="margin:0">Heute verbleibend · <span class="badge">Lebensmittel</span></h3>
+        <div style="display:flex; gap:8px"><button id="editBudgetBtn" class="pill">Budget einstellen</button><button id="setSpentBtn" class="pill">Bisher ausgegeben</button></div>
+      </div>
+      <div id="dailyInfo" class="muted">–</div>
+    </div>
+
+    <!-- Filter & Liste -->
+    <div class="card">
+      <div class="section-title">
+        <h3 style="margin:0">Ausgaben</h3>
+        <div class="tabs">
+          <button class="pill" data-range="today">Heute</button>
+          <button class="pill" data-range="week">Woche</button>
+          <button class="pill" data-range="month">Monat</button>
+          <button class="pill" data-range="all">Alle</button>
+        </div>
+      </div>
+      <div class="row">
+        <input id="search" placeholder="Suche in Name/Notiz/Kategorie">
+        <button id="addManualBtn" class="btn">+ Manuell</button>
+        <button id="importBtn" class="btn">Import CSV/TSV</button>
+        <button id="exportBtn" class="btn">Export</button>
+      </div>
+      <div id="list" class="list"></div>
+    </div>
+
+    <!-- Kategorien & Budgets -->
+    <div class="card">
+      <div class="section-title">
+        <h3 style="margin:0">Kategorien & Budgets</h3>
+        <button id="addCatBtn" class="btn">+ Kategorie</button>
+      </div>
+      <div id="cats" class="list"></div>
+    </div>
+
+    <div class="footer">PWA · Offline · Daten lokal (IndexedDB). | v1</div>
+  </div>
+
+  <template id="expense-template">
+    <div class="item">
+      <div>
+        <div><strong class="name"></strong> · <span class="amount"></span></div>
+        <div class="meta">
+          <span class="date"></span>
+          <span class="badge cat"></span>
+          <span class="note"></span>
+        </div>
+      </div>
+      <div class="right">
+        <button class="pill edit">Bearb.</button>
+        <button class="pill btn-danger del">Löschen</button>
+      </div>
+    </div>
+  </template>
+
+  <dialog id="expenseDialog">
+    <div class="card" style="margin:0">
+      <h3 id="dlgTitle" style="margin-top:0">Ausgabe</h3>
+      <div class="grid-2">
+        <input id="dlgName" placeholder="Name (z. B. Lidl)">
+        <input id="dlgAmount" placeholder="Betrag (z. B. 10,50)" inputmode="decimal">
+      </div>
+      <div class="grid-2">
+        <input id="dlgDate" type="date">
+        <input id="dlgCategory" placeholder="Kategorie (z. B. lebensmittel)">
+      </div>
+      <textarea id="dlgNote" placeholder="Notiz (optional)" rows="3"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button id="dlgSave" class="btn-primary">Speichern</button>
+        <button id="dlgCancel" class="btn">Abbrechen</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="budgetDialog">
+    <div class="card" style="margin:0">
+      <h3 style="margin:0 0 8px">Budget · Lebensmittel</h3>
+      <input id="budgetInput" placeholder="Monatsbudget (z. B. 300,00)" inputmode="decimal">
+      <div class="row" style="margin-top:8px">
+        <button id="budgetSave" class="btn-primary">Speichern</button>
+        <button id="budgetCancel" class="btn">Abbrechen</button>
+      </div>
+      <p class="tiny muted" style="margin-top:8px">„Heute verbleibend“ = (Budget/Monatstage × Heutiger Tag) − Bisher ausgegeben.</p>
+    </div>
+  </dialog>
+
+  
+  <dialog id="spentDialog">
+    <div class="card" style="margin:0">
+      <h3 style="margin:0 0 8px">Bisher ausgegeben · Lebensmittel</h3>
+      <input id="spentInput" placeholder="Summe im laufenden Monat (z. B. 124,80)" inputmode="decimal">
+      <div class="row" style="margin-top:8px">
+        <button id="spentSave" class="btn-primary">Speichern</button>
+        <button id="spentClear" class="btn">Zurücksetzen</button>
+        <button id="spentCancel" class="btn">Abbrechen</button>
+      </div>
+      <p class="tiny muted" style="margin-top:8px">Wenn gesetzt, wird diese Summe anstelle der berechneten Ausgaben verwendet.</p>
+    </div>
+  </dialog>
+
+  <input id="fileInput" type="file" accept=".csv,.tsv,text/tab-separated-values,text/csv" style="display:none">
+  
+
+  <div id="err" style="display:none;position:fixed;left:0;right:0;bottom:0;padding:8px 12px;background:#7f1d1d;color:#fecaca;border-top:1px solid #991b1b;font:14px system-ui;z-index:9999"></div>
+  <script>
+    window.addEventListener('error', function(e){
+      var el = document.getElementById('err');
+      el.style.display='block';
+      el.textContent = 'Fehler: ' + (e.message||e.error||'Unbekannt');
+    });
+    window.addEventListener('unhandledrejection', function(e){
+      var el = document.getElementById('err');
+      el.style.display='block';
+      el.textContent = 'Fehler (Promise): ' + (e.reason && (e.reason.message||e.reason)) ;
+    });
+  </script>
+
+</body>
+</html>
